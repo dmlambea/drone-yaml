@@ -49,7 +49,10 @@ func WithSecretFunc(f SecretFunc) func(*engine.Spec) {
 	return func(spec *engine.Spec) {
 		// first we get a unique list of all secrets
 		// used by the specification.
-		set := map[string]struct{}{}
+		set := map[string]int{}
+		for idx, s := range spec.Secrets {
+			set[s.Metadata.Name] = idx
+		}
 		for _, step := range spec.Steps {
 			// if we know the step is not going to run,
 			// we can ignore any secrets that it requires.
@@ -57,19 +60,23 @@ func WithSecretFunc(f SecretFunc) func(*engine.Spec) {
 				continue
 			}
 			for _, v := range step.Secrets {
-				set[v.Name] = struct{}{}
+				set[v.Name] = -1
 			}
 		}
 
 		// next we use the callback function to
 		// get the value for each secret, and append
 		// to the specification.
-		for name := range set {
+		for name, idx := range set {
 			secret := f(name)
 			if secret != nil {
 				secret.Metadata.UID = rand.String()
 				secret.Metadata.Namespace = spec.Metadata.Namespace
-				spec.Secrets = append(spec.Secrets, secret)
+				if idx == -1 {
+					spec.Secrets = append(spec.Secrets, secret)
+				} else {
+					spec.Secrets[idx] = secret
+				}
 			}
 		}
 	}
