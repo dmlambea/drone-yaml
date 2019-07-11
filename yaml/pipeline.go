@@ -115,6 +115,7 @@ type (
 		Name     string          `json:"name,omitempty"`
 		EmptyDir *VolumeEmptyDir `json:"temp,omitempty" yaml:"temp"`
 		HostPath *VolumeHostPath `json:"host,omitempty" yaml:"host"`
+		Secret   *VolumeSecret   `json:"secret,omitempty" yaml:"secret"`
 	}
 
 	// VolumeDevice describes a mapping of a raw block
@@ -143,6 +144,20 @@ type (
 	// host node's filesystem into your container.
 	VolumeHostPath struct {
 		Path string `json:"path,omitempty"`
+	}
+
+	// VolumeSecret mounts one or more files from a given
+	// secret name into your container.
+	VolumeSecret struct {
+		Name  string       `json:"name,omitempty"`
+		Items []*KeyToPath `json:"items,omitempty"`
+	}
+
+	// KeyToPath represents a key-path pair to be used in VolumeSecret
+	KeyToPath struct {
+		Key  string `json:"key"`
+		Path string `json:"path"`
+		Mode *int32 `json:"mode,omitempty"`
 	}
 
 	// Workspace represents the pipeline workspace configuraiton.

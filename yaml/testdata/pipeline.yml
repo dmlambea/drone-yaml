@@ -42,6 +42,9 @@ steps:
       baz: qux
     cache_from:
     - octocat/knife-spoon
+  volumes:
+  - name: secretdata
+    path: /secretdata
 
 - name: push
   push: octocat/hello-world
@@ -69,6 +72,15 @@ volumes:
 - name: other
   host:
     path: /tmp/data
+- name: secretdata
+  secret:
+    name: mySecret
+    items:
+    - key: secretkey1
+      path: secretfile1
+    - key: secretkey2
+      path: secretfile2
+      mode: 0600
 
 trigger:
   branch:
