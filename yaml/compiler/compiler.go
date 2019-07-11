@@ -123,7 +123,8 @@ func (c *Compiler) Compile(from *yaml.Pipeline) *engine.Spec {
 				Labels:    map[string]string{},
 			},
 		}
-		if from.EmptyDir != nil {
+		switch {
+		case from.EmptyDir != nil:
 			// if the yaml configuration specifies an empty
 			// directory volume (data volume) or an in-memory
 			// file system.
@@ -131,11 +132,18 @@ func (c *Compiler) Compile(from *yaml.Pipeline) *engine.Spec {
 				Medium:    from.EmptyDir.Medium,
 				SizeLimit: int64(from.EmptyDir.SizeLimit),
 			}
-		} else if from.HostPath != nil {
+		case from.HostPath != nil:
 			// if the yaml configuration specifies a bind
 			// mount to the host machine.
 			to.HostPath = &engine.VolumeHostPath{
 				Path: from.HostPath.Path,
+			}
+		case from.Secret != nil:
+			// if the yaml configuration specifies a secret
+			// mount
+			to.Secret = &engine.VolumeSecret{
+				Name:  from.Secret.Name,
+				Items: toSecretItems(from.Secret.Items),
 			}
 		}
 		spec.Docker.Volumes = append(spec.Docker.Volumes, to)
@@ -259,6 +267,18 @@ func (c *Compiler) Compile(from *yaml.Pipeline) *engine.Spec {
 	}
 
 	return spec
+}
+
+func toSecretItems(yamlItems []*yaml.KeyToPath) []*engine.KeyToPath {
+	engineItems := make([]*engine.KeyToPath, len(yamlItems))
+	for idx, item := range yamlItems {
+		engineItems[idx] = &engine.KeyToPath{
+			Key:  item.Key,
+			Path: item.Path,
+			Mode: item.Mode,
+		}
+	}
+	return engineItems
 }
 
 // return a .git-credentials file. If the user-defined
