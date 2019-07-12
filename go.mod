@@ -1,6 +1,6 @@
 module github.com/drone/drone-yaml
 
-replace github.com/drone/drone-runtime => github.com/dmlambea/drone-runtime v1.0.7-0.20190711102931-0918921bfd68
+replace github.com/drone/drone-runtime => github.com/dmlambea/drone-runtime v1.0.7
 
 require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
@@ -12,6 +12,7 @@ require (
 	github.com/drone/drone-runtime v1.0.5
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-cmp v0.2.0
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/sergi/go-diff v1.0.0
 	github.com/vinzenz/yaml v0.0.0-20170920082545-91409cdd725d
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
